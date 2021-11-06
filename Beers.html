@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Jacob Gipson and Tavin Weeda" />
+
+
+<title>Beer</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown-header">Analysis</li>
+<li>
+  <a href="Beers.html">Beer Study</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Beer</h1>
+<h4 class="author">Jacob Gipson and Tavin Weeda</h4>
+<h4 class="date">10/9/2021</h4>
+
+</div>
+
+
+<div id="beer-eda" class="section level1">
+<h1>Beer EDA</h1>
+<pre class="r"><code>#upload beer and breweries data
+beers = read.csv(&quot;C:\\Users\\tavin\\OneDrive\\Desktop\\DDS\\Project 1\\Beers.csv&quot;, header = TRUE)
+breweries = read.csv(&quot;C:\\Users\\tavin\\OneDrive\\Desktop\\DDS\\Project 1\\Breweries.csv&quot;, header = TRUE)</code></pre>
+<div id="question-1-how-many-breweries-are-in-each-state" class="section level3">
+<h3>Question 1: How many breweries are in each state?</h3>
+<pre class="r"><code>library(ggplot2)
+library(ggthemes)
+library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(RColorBrewer)
+####This creates a custom color palette
+
+  # Classic palette BuPu, with 4 colors
+  coul &lt;- brewer.pal(4, &quot;PuOr&quot;) 
+
+  # Add more colors to this palette :
+  coul &lt;- colorRampPalette(coul)(51)
+
+##Make Brewery count graph
+ 
+brewerycount = data.frame(table(breweries[&#39;State&#39;]))
+colnames(brewerycount) = c(&#39;State&#39;, &#39;BrewCount&#39;)
+brewerycount</code></pre>
+<pre><code>##    State BrewCount
+## 1     AK         7
+## 2     AL         3
+## 3     AR         2
+## 4     AZ        11
+## 5     CA        39
+## 6     CO        47
+## 7     CT         8
+## 8     DC         1
+## 9     DE         2
+## 10    FL        15
+## 11    GA         7
+## 12    HI         4
+## 13    IA         5
+## 14    ID         5
+## 15    IL        18
+## 16    IN        22
+## 17    KS         3
+## 18    KY         4
+## 19    LA         5
+## 20    MA        23
+## 21    MD         7
+## 22    ME         9
+## 23    MI        32
+## 24    MN        12
+## 25    MO         9
+## 26    MS         2
+## 27    MT         9
+## 28    NC        19
+## 29    ND         1
+## 30    NE         5
+## 31    NH         3
+## 32    NJ         3
+## 33    NM         4
+## 34    NV         2
+## 35    NY        16
+## 36    OH        15
+## 37    OK         6
+## 38    OR        29
+## 39    PA        25
+## 40    RI         5
+## 41    SC         4
+## 42    SD         1
+## 43    TN         3
+## 44    TX        28
+## 45    UT         4
+## 46    VA        16
+## 47    VT        10
+## 48    WA        23
+## 49    WI        20
+## 50    WV         1
+## 51    WY         4</code></pre>
+<pre class="r"><code>brewerycount %&gt;%
+  ggplot(aes(x = reorder(State, BrewCount), y = BrewCount, fill = State)) +
+  theme_classic() +
+  geom_bar(stat = &quot;identity&quot;,fill=coul)+
+  coord_flip() + 
+  theme(legend.position = &quot;none&quot;) + 
+  ylab(&quot;Number of Breweries&quot;) +
+  xlab(&quot;State&quot;) +
+  ggtitle(&quot;Number of Breweries in Each State&quot;) </code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="question-2-merge-beer-data-with-the-breweries-data.-print-the-first-6-observations-and-the-last-six-observations-to-check-the-merged-file.-rmd-only-this-does-not-need-to-be-included-in-the-presentation-or-the-deck." class="section level3">
+<h3>Question 2: Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file. (RMD only, this does not need to be included in the presentation or the deck.)</h3>
+<pre class="r"><code>colnames(breweries)[1] = &quot;Brewery_id&quot;
+colnames(breweries)[2] = &quot;Brewery Name&quot;
+fullbeer &lt;- left_join(beers, breweries, by = &quot;Brewery_id&quot;)
+head(fullbeer, n = 6)</code></pre>
+<pre><code>##                  Name Beer_ID   ABV IBU Brewery_id                          Style Ounces
+## 1            Pub Beer    1436 0.050  NA        409            American Pale Lager     12
+## 2         Devil&#39;s Cup    2265 0.066  NA        178        American Pale Ale (APA)     12
+## 3 Rise of the Phoenix    2264 0.071  NA        178                   American IPA     12
+## 4            Sinister    2263 0.090  NA        178 American Double / Imperial IPA     12
+## 5       Sex and Candy    2262 0.075  NA        178                   American IPA     12
+## 6        Black Exodus    2261 0.077  NA        178                  Oatmeal Stout     12
+##                Brewery Name City State
+## 1 10 Barrel Brewing Company Bend    OR
+## 2       18th Street Brewery Gary    IN
+## 3       18th Street Brewery Gary    IN
+## 4       18th Street Brewery Gary    IN
+## 5       18th Street Brewery Gary    IN
+## 6       18th Street Brewery Gary    IN</code></pre>
+<pre class="r"><code>tail(fullbeer, n = 6)</code></pre>
+<pre><code>##                             Name Beer_ID   ABV IBU Brewery_id                    Style Ounces
+## 2405 Rocky Mountain Oyster Stout    1035 0.075  NA        425           American Stout     12
+## 2406                   Belgorado     928 0.067  45        425              Belgian IPA     12
+## 2407               Rail Yard Ale     807 0.052  NA        425 American Amber / Red Ale     12
+## 2408             B3K Black Lager     620 0.055  NA        425              Schwarzbier     12
+## 2409         Silverback Pale Ale     145 0.055  40        425  American Pale Ale (APA)     12
+## 2410        Rail Yard Ale (2009)      84 0.052  NA        425 American Amber / Red Ale     12
+##                 Brewery Name   City State
+## 2405 Wynkoop Brewing Company Denver    CO
+## 2406 Wynkoop Brewing Company Denver    CO
+## 2407 Wynkoop Brewing Company Denver    CO
+## 2408 Wynkoop Brewing Company Denver    CO
+## 2409 Wynkoop Brewing Company Denver    CO
+## 2410 Wynkoop Brewing Company Denver    CO</code></pre>
+</div>
+<div id="question-3-address-the-missing-values-in-each-column." class="section level3">
+<h3>Question 3: Address the missing values in each column.</h3>
+</div>
+<div id="we-filled-in-missing-abv-and-ibu-values-with-averages-for-the-beers-style." class="section level2">
+<h2>We filled in missing ABV and IBU values with averages for the beer’s style.</h2>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages ------------------------------------------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## v tibble  3.1.3     v purrr   0.3.4
+## v tidyr   1.1.4     v stringr 1.4.0
+## v readr   2.0.2     v forcats 0.5.1</code></pre>
+<pre><code>## -- Conflicts ---------------------------------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>#Number of missing ABV values
+sum(is.na(fullbeer$ABV))</code></pre>
+<pre><code>## [1] 62</code></pre>
+<pre class="r"><code>#Number of missing IBU values
+sum(is.na(fullbeer$IBU))</code></pre>
+<pre><code>## [1] 1005</code></pre>
+<pre class="r"><code>fullbeer$Style = as.factor(fullbeer$Style)
+styles_list&lt;-unique(fullbeer$Style)
+
+#Fill in missing IBU Values with mean IBU value of the style of beer
+ for(sty in 1:length(styles_list)){
+    l&lt;-fullbeer[fullbeer$Style==styles_list[sty],]
+    m&lt;-l[!(is.na(l$IBU)),]
+    n&lt;-mean(m$IBU)
+   fullbeer$IBU[fullbeer$Style==styles_list[sty] &amp; is.na(fullbeer$IBU)]&lt;-n
+ }
+
+#Fill in missing ABV Values with mean ABV value of the style of beer
+ for(sty in 1:length(styles_list)){
+    l&lt;-fullbeer[fullbeer$Style==styles_list[sty],]
+    m&lt;-l[!(is.na(l$ABV)),]
+    n&lt;-mean(m$ABV)
+   fullbeer$ABV[fullbeer$Style==styles_list[sty] &amp; is.na(fullbeer$ABV)]&lt;-n
+ }
+
+#No more missing ABV values
+sum(is.na(fullbeer$ABV))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>#We still have 52 missing IBU values
+sum(is.na(fullbeer$IBU))</code></pre>
+<pre><code>## [1] 52</code></pre>
+<pre class="r"><code>#We assume all mead and ciders should have an IBU of 0 as they generally do not come with an IBU value.
+#The rest of the styles were looked up.
+fullbeer$IBU[fullbeer$Style == &quot;Cider&quot;] = 0
+fullbeer$IBU[fullbeer$Style == &quot;Mead&quot;] = 0
+fullbeer$IBU[fullbeer$Style == &quot;Rauchbier&quot;] = 0
+fullbeer$IBU[fullbeer$Style == &quot;Shandy&quot;] = 0
+fullbeer$IBU[fullbeer$Style == &quot;American Malt Liquor&quot;] = 0
+fullbeer$IBU[fullbeer$Style == &quot;Kristalweizen&quot;] = 40
+fullbeer$IBU[fullbeer$Style == &quot;Flanders Red Ale&quot;] = 59
+fullbeer$IBU[fullbeer$Style == &quot;Braggot&quot;] = 12
+fullbeer$IBU[fullbeer$Style == &quot;Low Alcohol Beer&quot;] = 0
+
+#No more missing IBU values
+sum(is.na(fullbeer$IBU))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code># 5 rows are missing styles.  2527 and 1635 are actual beers.  The other 3 are not specific beers so they were removed
+fullbeer$Style = as.character(fullbeer$Style)
+fullbeer$Style[fullbeer$Beer_ID == 2527] = &quot;MÃ¤rzen / Oktoberfest&quot;
+fullbeer$Style[fullbeer$Beer_ID == 1635] = &quot;Scottish Ale&quot;
+
+
+fullbeer$Style = as.factor(fullbeer$Style)
+
+#Now the two beers have a style
+fullbeer[fullbeer$Beer_ID == 67,]</code></pre>
+<pre><code>##                 Name Beer_ID   ABV IBU Brewery_id        Style Ounces        Brewery Name    City State
+## 1893 Modus Hoperandi      67 0.068  65        265 American IPA     12 Ska Brewing Company Durango    CO</code></pre>
+<pre class="r"><code>fullbeer[fullbeer$Beer_ID == 1635,]</code></pre>
+<pre><code>##                               Name Beer_ID  ABV IBU Brewery_id        Style Ounces               Brewery Name
+## 854 Kilt Lifter Scottish-Style Ale    1635 0.06  21        161 Scottish Ale     12 Four Peaks Brewing Company
+##      City State
+## 854 Tempe    AZ</code></pre>
+<pre class="r"><code>fullbeer&lt;-fullbeer[!(fullbeer$Beer_ID == 2210 | fullbeer$Beer_ID==1796|fullbeer$Beer_ID==1790),]</code></pre>
+<div id="question-4-compute-the-median-alcohol-content-and-international-bitterness-unit-for-each-state.-plot-a-bar-chart-to-compare." class="section level3">
+<h3>Question 4: Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.</h3>
+<pre class="r"><code>library(dplyr)
+fullbeer$State = as.factor(fullbeer$State)
+medians = fullbeer %&gt;%
+  group_by(State) %&gt;%
+  summarise(medianABV = median(ABV), medianIBU = median(IBU))
+
+medians$medianABV&lt;-round(medians$medianABV*100,digits=1)
+
+medians %&gt;%
+  ggplot(aes(y = reorder(State, medianABV), x = medianABV, fill = State)) +
+  geom_bar(stat = &quot;identity&quot;,fill=coul) +
+  theme_clean() +
+    
+  theme(legend.position = &quot;none&quot;) + 
+  ylab(&quot;State&quot;) +
+  xlab(&quot;ABV (%)&quot;) +
+  ggtitle(&quot;Median Beer ABV in Each State&quot;)+coord_cartesian(xlim=c(3,7))</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>medians %&gt;%
+  ggplot(aes(y = reorder(State, medianIBU), x = medianIBU, fill = State)) +
+  geom_bar(stat = &quot;identity&quot;,fill=coul) +
+  theme_clean() +
+  theme(legend.position = &quot;none&quot;) + 
+  ylab(&quot;IBU&quot;) +
+  xlab(&quot;State&quot;) +
+  ggtitle(&quot;Median Beer IBU in Each State&quot;)+coord_cartesian(xlim=c(15,70))</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+</div>
+<div id="question-5-which-state-has-the-maximum-alcoholic-abv-beer-which-state-has-the-most-bitter-ibu-beer" class="section level3">
+<h3>Question 5: Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?</h3>
+<pre class="r"><code>#Highest ABV
+fullbeer[which.max(fullbeer$ABV),]</code></pre>
+<pre><code>##                                                      Name Beer_ID   ABV IBU Brewery_id            Style Ounces
+## 2279 Lee Hill Series Vol. 5 - Belgian Style Quadrupel Ale    2565 0.128  24         52 Quadrupel (Quad)   19.2
+##                 Brewery Name    City State
+## 2279 Upslope Brewing Company Boulder    CO</code></pre>
+<pre class="r"><code>#Most Bitter - Highest IBU
+fullbeer[which.max(fullbeer$IBU),]</code></pre>
+<pre><code>##                          Name Beer_ID   ABV IBU Brewery_id                          Style Ounces
+## 148 Bitter Bitch Imperial IPA     980 0.082 138        375 American Double / Imperial IPA     12
+##                Brewery Name    City State
+## 148 Astoria Brewing Company Astoria    OR</code></pre>
+</div>
+<div id="question-6-comment-on-the-summary-statistics-and-distribution-of-the-abv-variable." class="section level3">
+<h3>Question 6: Comment on the summary statistics and distribution of the ABV variable.</h3>
+<pre class="r"><code>summary(fullbeer$ABV)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.00100 0.05000 0.05647 0.05975 0.06700 0.12800</code></pre>
+<pre class="r"><code>fullbeer$ABV&lt;-round(fullbeer$ABV*100,digits=1)
+
+fullbeer %&gt;%
+  ggplot(aes(x = ABV, fill = &quot;red&quot;))+
+  geom_histogram() +
+  theme_clean() + 
+  theme(legend.position = &quot;none&quot;) +
+  ylab(&quot;Beer Count&quot;) +
+  ggtitle(&quot;Histogram of Beer ABV&quot;)+
+  xlab(&quot;ABV (%)&quot;)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>fullbeer %&gt;% 
+  ggplot(aes(x = ABV, color = &quot;red&quot;)) +
+  geom_density() + 
+  theme_clean() +
+  theme(legend.position = &quot;none&quot;) +
+  ggtitle(&quot;Density plot of Beer ABV&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<pre class="r"><code># Very right skewed distribution. Most beers are in the range of 0.04 - 0.06.</code></pre>
+</div>
+<div id="question-7-is-there-an-apparent-relationship-between-the-bitterness-of-the-beer-and-its-alcoholic-content-draw-a-scatter-plot.-make-your-best-judgment-of-a-relationship-and-explain-your-answer." class="section level3">
+<h3>Question 7: Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot. Make your best judgment of a relationship and EXPLAIN your answer.</h3>
+<pre class="r"><code>library(ggpmisc)</code></pre>
+<pre><code>## Loading required package: ggpp</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ggpp&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     annotate</code></pre>
+<pre class="r"><code>my.formula = y ~ x
+fullbeer %&gt;%
+  ggplot(aes(x=ABV,y=IBU))+
+  geom_point(position = &quot;jitter&quot;) +
+  geom_smooth(method=&quot;lm&quot;, color = &quot;red&quot;) +
+  stat_poly_eq(formula = my.formula, 
+               aes(label = paste(..eq.label.., ..rr.label.., sep = &quot;~~~&quot;)), 
+               parse = TRUE,
+               label.y = 0.87,
+               eq.x.rhs = &quot;ABV&quot;) +
+  theme_clean() +
+  ggtitle(&quot;IBU vs ABV&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-8-1.png" width="672" /> ### Question 8: Use KNN classification to investigate the difference between IPAs and other typles of Ales with respect to IBU and ABV.</p>
+<pre class="r"><code>library(class)
+library(caret)</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## 
+## Attaching package: &#39;caret&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     lift</code></pre>
+<pre class="r"><code>#First we pull all the beers that are IPA&#39;s or have Ale in the name
+IPAsandAles&lt;-fullbeer[grepl(&quot;IPA|Ale&quot;,fullbeer$Style),]
+
+#Then we split the data into 2 groups: IPA&#39;s and Ales
+IPAs &lt;- IPAsandAles[grepl(&quot;IPA|India Pale Ale&quot;, IPAsandAles$Style),]
+Ales &lt;- IPAsandAles[!grepl(&quot;IPA|India Pale Ale&quot;, IPAsandAles$Style),]
+
+#Create a new column to identify each beer as IPA or Ale and then re-combine datasets
+IPAs$Class = &quot;IPA&quot;
+Ales$Class = &quot;Ale&quot;
+IPAsandAles &lt;- rbind(IPAs, Ales)
+
+#Create new data frame from IPAsandAles that only includes IBU, ABV, and Class information.
+IPAAle &lt;- data.frame(ABV = IPAsandAles$ABV, 
+                     IBU = IPAsandAles$IBU, 
+                     ZABV = scale(IPAsandAles$ABV),
+                     ZIBU = scale(IPAsandAles$IBU),
+                     Class = IPAsandAles$Class)
+
+#We are first splitting our data into a training set and a validation set.
+
+#Train 80% validate 20%
+set.seed(1)
+trainIndices = sample(1:dim(IPAAle)[1],round(.8* dim(IPAAle)[1]))
+train = IPAAle[trainIndices,]
+validate = IPAAle[-trainIndices,]
+
+#To tune the hyperparameters, we did a  cross validation and a for loop using train/test splits.  
+
+iterations = 500
+numks = 30
+masterAcc = matrix(nrow = 1, ncol = numks)
+masterSens = matrix(nrow = 1, ncol = numks)
+masterSpec = matrix(nrow = 1, ncol = numks)
+
+  for(i in 1:numks)
+  {
+    classifications = knn.cv(train[,c(3,4)],train$Class, prob = TRUE, k = i)
+    table(classifications,train$Class)
+    CM = confusionMatrix(table(classifications,train$Class))
+    masterAcc[1,i] = CM$overall[1]
+    masterSens[1,i]=CM$byClass[1]
+    masterSpec[1,i]=CM$byClass[2]
+  }
+
+MeanAcc = colMeans(masterAcc)
+MeanSens=colMeans(masterSens)
+MeanSpec = colMeans(masterSpec)
+
+#Make plots to see the effect of K
+par(mfrow=c(1,3))
+CVAcc = data.frame(K = seq(1,numks,1), MeanAcc = MeanAcc)
+CVAcc %&gt;% 
+  ggplot(aes(K, MeanAcc)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab(&quot;Accuracy&quot;)+
+  ggtitle(&quot;Effect of K on Accuracy (CV)&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>CVSens = data.frame(K = seq(1,numks,1), MeanSens = MeanSens)
+CVSens %&gt;% 
+  ggplot(aes(K, MeanSens)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab(&quot;Sensitivity&quot;)+
+  ggtitle(&quot;Effect of K on Sensitivity (CV)&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<pre class="r"><code>CVSpec = data.frame(K = seq(1,numks,1), MeanSpec = MeanSpec)
+CVSpec %&gt;% 
+  ggplot(aes(K, MeanSpec)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab(&quot;Specificity&quot;)+
+  ggtitle(&quot;Effect of K on Specificity (CV)&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-9-3.png" width="672" /></p>
+<pre class="r"><code># This for loop creates 500 iterations of train/test splits (from the training data) to tune k
+iterations = 500
+numks = 30
+masterAcc = matrix(nrow = iterations, ncol = numks)
+masterSens = matrix(nrow = iterations, ncol = numks)
+masterSpec = matrix(nrow = iterations, ncol = numks)
+splitPerc=.75
+
+for(j in 1:iterations)
+{
+  trainIndices = sample(1:dim(train)[1],round(splitPerc * dim(train)[1]))
+  train1 = train[trainIndices,]
+  test1 = train[-trainIndices,]
+  for(i in 1:numks)
+  {
+    classifications = knn(train1[,c(3,4)],test1[,c(3,4)],train1$Class, prob = TRUE, k = i)
+    CM = confusionMatrix(table(classifications,test1$Class))
+    masterAcc[j,i] = CM$overall[1]
+    masterSens[j,i] = CM$byClass[1]
+    masterSpec[j,i] = CM$byClass[2]
+  }
+}
+
+MeanAcc = colMeans(masterAcc)
+MeanSens = colMeans(masterSens)
+MeanSpec = colMeans(masterSpec)
+
+kAcc = data.frame(K = seq(1,numks,1), Accuracy = MeanAcc)
+kAcc %&gt;% 
+  ggplot(aes(K, Accuracy)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab(&quot;Accuracy&quot;)+
+  ggtitle(&quot;Effect of K on Accuracy (Train/Test Split)&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-9-4.png" width="672" /></p>
+<pre class="r"><code>kSens = data.frame(K = seq(1,numks,1), Sensitivity = MeanSens)
+kSens %&gt;% 
+  ggplot(aes(K, Sensitivity)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab(&quot;Sensitivity&quot;)+
+  ggtitle(&quot;Effect of K on Sensitivity (Train/Test Split)&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-9-5.png" width="672" /></p>
+<pre class="r"><code>kSpec = data.frame(K = seq(1,numks,1), Specificity = MeanSpec)
+kSpec %&gt;% 
+  ggplot(aes(K, MeanSpec)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab(&quot;Specificity&quot;)+
+  ggtitle(&quot;Effect of K on Specificity (Train/Test Split)&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-9-6.png" width="672" /></p>
+<pre class="r"><code>#We settled on k=25 as it balanced Accuracy, Sensitivity and Specificity the best.
+classifications = knn(train[,c(3,4)],validate[,c(3,4)],train$Class, prob = TRUE, k = 19)
+CM = confusionMatrix(table(classifications,validate$Class))
+confusionMatrix(table(classifications,validate$Class))</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##                
+## classifications Ale IPA
+##             Ale 188  23
+##             IPA  18  78
+##                                           
+##                Accuracy : 0.8664          
+##                  95% CI : (0.8232, 0.9024)
+##     No Information Rate : 0.671           
+##     P-Value [Acc &gt; NIR] : 3.226e-15       
+##                                           
+##                   Kappa : 0.6937          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.5322          
+##                                           
+##             Sensitivity : 0.9126          
+##             Specificity : 0.7723          
+##          Pos Pred Value : 0.8910          
+##          Neg Pred Value : 0.8125          
+##              Prevalence : 0.6710          
+##          Detection Rate : 0.6124          
+##    Detection Prevalence : 0.6873          
+##       Balanced Accuracy : 0.8424          
+##                                           
+##        &#39;Positive&#39; Class : Ale             
+## </code></pre>
+<p>###Exploring a Naive Bayes model</p>
+<pre class="r"><code>##Naive Bayes Exploration
+
+library(e1071)
+model = naiveBayes(Class~ABV+IBU,data = train)
+confusionMatrix(table(predict(model,validate[,c(1,2)]),as.factor(validate$Class)))</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##      
+##       Ale IPA
+##   Ale 186  20
+##   IPA  20  81
+##                                           
+##                Accuracy : 0.8697          
+##                  95% CI : (0.8268, 0.9053)
+##     No Information Rate : 0.671           
+##     P-Value [Acc &gt; NIR] : 9.98e-16        
+##                                           
+##                   Kappa : 0.7049          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 1               
+##                                           
+##             Sensitivity : 0.9029          
+##             Specificity : 0.8020          
+##          Pos Pred Value : 0.9029          
+##          Neg Pred Value : 0.8020          
+##              Prevalence : 0.6710          
+##          Detection Rate : 0.6059          
+##    Detection Prevalence : 0.6710          
+##       Balanced Accuracy : 0.8524          
+##                                           
+##        &#39;Positive&#39; Class : Ale             
+## </code></pre>
+<p>###Other Useful Inference: Most and Least numerous type of beer by State</p>
+<pre class="r"><code>count_by_state&lt;-fullbeer%&gt;%group_by(State)%&gt;%count(Style)
+max_counts_by_State&lt;-count_by_state%&gt;%group_by(State)%&gt;%summarize(n=max(n))
+style_by_state&lt;-left_join(max_counts_by_State,count_by_state,by=c(&quot;State&quot;,&quot;n&quot;))
+style_by_state$Style = as.factor(style_by_state$Style)
+
+summary(style_by_state)</code></pre>
+<pre><code>##      State          n                                     Style   
+##   DC    : 8   Min.   : 1.000   American IPA                  :39  
+##   SD    : 7   1st Qu.: 1.000   American Pale Ale (APA)       :19  
+##   AR    : 5   Median : 3.000   American Blonde Ale           : 6  
+##   IA    : 5   Mean   : 6.031   American Amber / Red Ale      : 4  
+##   CT    : 3   3rd Qu.: 6.000   American Brown Ale            : 3  
+##   GA    : 3   Max.   :45.000   American Double / Imperial IPA: 3  
+##  (Other):65                    (Other)                       :22</code></pre>
+<pre class="r"><code>most_popular_styles = 
+  style_by_state %&gt;%
+  group_by(Style) %&gt;%
+  summarise(n = n())
+
+most_popular_styles %&gt;%
+  ggplot(aes(x = reorder(Style, n), y = n, fill = Style)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  theme_clean() +
+  coord_flip() + 
+  theme(legend.position = &quot;none&quot;) + 
+  ylab(&quot;Frequency of most numerous beers in each state&quot;) +
+  xlab(&quot;Style&quot;) +
+  ggtitle(&quot;Most numerous beers in Each State&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>IPAState = count_by_state%&gt;%group_by(State)%&gt;%filter(Style == &quot;American IPA&quot;)
+IPAState %&gt;%
+  ggplot(aes(x = reorder(State, n), y = n, fill = State)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  theme_clean() +
+  coord_flip() + 
+  theme(legend.position = &quot;none&quot;) + 
+  ylab(&quot;Number of American IPA&#39;s&quot;) +
+  xlab(&quot;State&quot;) +
+  ggtitle(&quot;Number of American IPA&#39;s in each state&quot;)</code></pre>
+<p><img src="Beers_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<pre class="r"><code>#We could make the conclusion that IPA&#39;s could be introduced into those markets that don&#39;t have many IPA&#39;s as that is the most popular class of beers in the states. 
+
+max_style_by_state = style_by_state %&gt;% group_by(State) %&gt;% summarize(n= max(n))
+summary(as.factor(style_by_state$Style))</code></pre>
+<pre><code>##                                                        Abbey Single Ale                             Altbier 
+##                                   0                                   0                                   0 
+##              American Adjunct Lager            American Amber / Red Ale          American Amber / Red Lager 
+##                                   1                                   4                                   1 
+##                 American Barleywine                  American Black Ale                 American Blonde Ale 
+##                                   0                                   1                                   6 
+##                  American Brown Ale             American Dark Wheat Ale      American Double / Imperial IPA 
+##                                   3                                   0                                   3 
+##  American Double / Imperial Pilsner    American Double / Imperial Stout           American India Pale Lager 
+##                                   0                                   0                                   0 
+##                        American IPA                American Malt Liquor             American Pale Ale (APA) 
+##                                  39                                   0                                  19 
+##                 American Pale Lager             American Pale Wheat Ale                    American Pilsner 
+##                                   0                                   2                                   1 
+##                     American Porter                      American Stout                 American Strong Ale 
+##                                   3                                   0                                   0 
+##                  American White IPA                   American Wild Ale                       Baltic Porter 
+##                                   0                                   0                                   0 
+##                    Belgian Dark Ale                         Belgian IPA                    Belgian Pale Ale 
+##                                   0                                   0                                   1 
+##             Belgian Strong Dark Ale             Belgian Strong Pale Ale                  Berliner Weissbier 
+##                                   0                                   0                                   1 
+##                     BiÃ¨re de Garde                                Bock                             Braggot 
+##                                   0                                   0                                   0 
+##      California Common / Steam Beer                          Chile Beer                               Cider 
+##                                   0                                   0                                   0 
+##                           Cream Ale                      Czech Pilsener                          Doppelbock 
+##                                   1                                   0                                   0 
+##           Dortmunder / Export Lager                              Dubbel                        Dunkelweizen 
+##                                   0                                   0                                   0 
+##                  English Barleywine                      English Bitter                   English Brown Ale 
+##                                   0                                   0                                   0 
+##               English Dark Mild Ale        English India Pale Ale (IPA)                    English Pale Ale 
+##                                   0                                   0                                   0 
+##               English Pale Mild Ale                       English Stout                  English Strong Ale 
+##                                   0                                   0                                   0 
+##                     Euro Dark Lager                     Euro Pale Lager Extra Special / Strong Bitter (ESB) 
+##                                   0                                   0                                   1 
+##                  Flanders Oud Bruin                    Flanders Red Ale              Foreign / Export Stout 
+##                                   0                                   0                                   0 
+##              Fruit / Vegetable Beer                     German Pilsener                                Gose 
+##                                   0                                   0                                   0 
+##                            Grisette                          Hefeweizen                Herbed / Spiced Beer 
+##                                   0                                   1                                   1 
+##                     Irish Dry Stout                       Irish Red Ale                             KÃ¶lsch 
+##                                   0                                   1                                   0 
+##          Keller Bier / Zwickel Bier                       Kristalweizen                         Light Lager 
+##                                   0                                   0                                   0 
+##                    Low Alcohol Beer               MÃ¤rzen / Oktoberfest               Maibock / Helles Bock 
+##                                   0                                   1                                   0 
+##                                Mead                  Milk / Sweet Stout                 Munich Dunkel Lager 
+##                                   0                                   0                                   0 
+##                 Munich Helles Lager                       Oatmeal Stout                             Old Ale 
+##                                   0                                   1                                   0 
+##                               Other                         Pumpkin Ale                    Quadrupel (Quad) 
+##                                   0                                   0                                   0 
+##                              Radler                           Rauchbier                          Roggenbier 
+##                                   0                                   0                                   0 
+##              Russian Imperial Stout                            Rye Beer              Saison / Farmhouse Ale 
+##                                   0                                   0                                   0 
+##                         Schwarzbier              Scotch Ale / Wee Heavy                        Scottish Ale 
+##                                   1                                   1                                   1 
+##                              Shandy                         Smoked Beer                              Tripel 
+##                                   0                                   0                                   0 
+##                        Vienna Lager                           Wheat Ale                       Winter Warmer 
+##                                   0                                   0                                   0 
+##                             Witbier 
+##                                   1</code></pre>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,391 @@
+---
+title: "Beer"
+author: "Jacob Gipson and Tavin Weeda"
+date: "10/9/2021"
+output: html_document
+---
+
+# Beer EDA
+```{r}
+#upload beer and breweries data
+beers = read.csv("C:\\Users\\tavin\\OneDrive\\Desktop\\DDS\\Project 1\\Beers.csv", header = TRUE)
+breweries = read.csv("C:\\Users\\tavin\\OneDrive\\Desktop\\DDS\\Project 1\\Breweries.csv", header = TRUE)
+```
+
+### Question 1: How many breweries are in each state?
+```{r}
+library(ggplot2)
+library(ggthemes)
+library(dplyr)
+library(RColorBrewer)
+####This creates a custom color palette
+
+  # Classic palette BuPu, with 4 colors
+  coul <- brewer.pal(4, "PuOr") 
+
+  # Add more colors to this palette :
+  coul <- colorRampPalette(coul)(51)
+
+##Make Brewery count graph
+ 
+brewerycount = data.frame(table(breweries['State']))
+colnames(brewerycount) = c('State', 'BrewCount')
+brewerycount
+brewerycount %>%
+  ggplot(aes(x = reorder(State, BrewCount), y = BrewCount, fill = State)) +
+  theme_classic() +
+  geom_bar(stat = "identity",fill=coul)+
+  coord_flip() + 
+  theme(legend.position = "none") + 
+  ylab("Number of Breweries") +
+  xlab("State") +
+  ggtitle("Number of Breweries in Each State") 
+  
+```
+  
+### Question 2: Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.  (RMD only, this does not need to be included in the presentation or the deck.)
+```{r}
+colnames(breweries)[1] = "Brewery_id"
+colnames(breweries)[2] = "Brewery Name"
+fullbeer <- left_join(beers, breweries, by = "Brewery_id")
+head(fullbeer, n = 6)
+tail(fullbeer, n = 6)
+```
+
+### Question 3: Address the missing values in each column.
+## We filled in missing ABV and IBU values with averages for the beer's style. 
+```{r}
+library(tidyverse)
+#Number of missing ABV values
+sum(is.na(fullbeer$ABV))
+#Number of missing IBU values
+sum(is.na(fullbeer$IBU))
+
+fullbeer$Style = as.factor(fullbeer$Style)
+styles_list<-unique(fullbeer$Style)
+
+#Fill in missing IBU Values with mean IBU value of the style of beer
+ for(sty in 1:length(styles_list)){
+    l<-fullbeer[fullbeer$Style==styles_list[sty],]
+    m<-l[!(is.na(l$IBU)),]
+    n<-mean(m$IBU)
+   fullbeer$IBU[fullbeer$Style==styles_list[sty] & is.na(fullbeer$IBU)]<-n
+ }
+
+#Fill in missing ABV Values with mean ABV value of the style of beer
+ for(sty in 1:length(styles_list)){
+    l<-fullbeer[fullbeer$Style==styles_list[sty],]
+    m<-l[!(is.na(l$ABV)),]
+    n<-mean(m$ABV)
+   fullbeer$ABV[fullbeer$Style==styles_list[sty] & is.na(fullbeer$ABV)]<-n
+ }
+
+#No more missing ABV values
+sum(is.na(fullbeer$ABV))
+#We still have 52 missing IBU values
+sum(is.na(fullbeer$IBU))
+
+
+#We assume all mead and ciders should have an IBU of 0 as they generally do not come with an IBU value.
+#The rest of the styles were looked up.
+fullbeer$IBU[fullbeer$Style == "Cider"] = 0
+fullbeer$IBU[fullbeer$Style == "Mead"] = 0
+fullbeer$IBU[fullbeer$Style == "Rauchbier"] = 0
+fullbeer$IBU[fullbeer$Style == "Shandy"] = 0
+fullbeer$IBU[fullbeer$Style == "American Malt Liquor"] = 0
+fullbeer$IBU[fullbeer$Style == "Kristalweizen"] = 40
+fullbeer$IBU[fullbeer$Style == "Flanders Red Ale"] = 59
+fullbeer$IBU[fullbeer$Style == "Braggot"] = 12
+fullbeer$IBU[fullbeer$Style == "Low Alcohol Beer"] = 0
+
+#No more missing IBU values
+sum(is.na(fullbeer$IBU))
+
+# 5 rows are missing styles.  2527 and 1635 are actual beers.  The other 3 are not specific beers so they were removed
+fullbeer$Style = as.character(fullbeer$Style)
+fullbeer$Style[fullbeer$Beer_ID == 2527] = "MÃ¤rzen / Oktoberfest"
+fullbeer$Style[fullbeer$Beer_ID == 1635] = "Scottish Ale"
+
+
+fullbeer$Style = as.factor(fullbeer$Style)
+
+#Now the two beers have a style
+fullbeer[fullbeer$Beer_ID == 67,]
+fullbeer[fullbeer$Beer_ID == 1635,]
+fullbeer<-fullbeer[!(fullbeer$Beer_ID == 2210 | fullbeer$Beer_ID==1796|fullbeer$Beer_ID==1790),]
+```
+
+### Question 4: Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+```{r}
+library(dplyr)
+fullbeer$State = as.factor(fullbeer$State)
+medians = fullbeer %>%
+  group_by(State) %>%
+  summarise(medianABV = median(ABV), medianIBU = median(IBU))
+
+medians$medianABV<-round(medians$medianABV*100,digits=1)
+
+medians %>%
+  ggplot(aes(y = reorder(State, medianABV), x = medianABV, fill = State)) +
+  geom_bar(stat = "identity",fill=coul) +
+  theme_clean() +
+    
+  theme(legend.position = "none") + 
+  ylab("State") +
+  xlab("ABV (%)") +
+  ggtitle("Median Beer ABV in Each State")+coord_cartesian(xlim=c(3,7))
+
+medians %>%
+  ggplot(aes(y = reorder(State, medianIBU), x = medianIBU, fill = State)) +
+  geom_bar(stat = "identity",fill=coul) +
+  theme_clean() +
+  theme(legend.position = "none") + 
+  ylab("IBU") +
+  xlab("State") +
+  ggtitle("Median Beer IBU in Each State")+coord_cartesian(xlim=c(15,70))
+
+```
+
+### Question 5: Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?
+```{r}
+#Highest ABV
+fullbeer[which.max(fullbeer$ABV),]
+#Most Bitter - Highest IBU
+fullbeer[which.max(fullbeer$IBU),]
+```
+
+### Question 6:	Comment on the summary statistics and distribution of the ABV variable.
+```{r}
+summary(fullbeer$ABV)
+fullbeer$ABV<-round(fullbeer$ABV*100,digits=1)
+
+fullbeer %>%
+  ggplot(aes(x = ABV, fill = "red"))+
+  geom_histogram() +
+  theme_clean() + 
+  theme(legend.position = "none") +
+  ylab("Beer Count") +
+  ggtitle("Histogram of Beer ABV")+
+  xlab("ABV (%)")
+
+fullbeer %>% 
+  ggplot(aes(x = ABV, color = "red")) +
+  geom_density() + 
+  theme_clean() +
+  theme(legend.position = "none") +
+  ggtitle("Density plot of Beer ABV")
+
+# Very right skewed distribution. Most beers are in the range of 0.04 - 0.06.
+```
+
+### Question 7: Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.  Make your best judgment of a relationship and EXPLAIN your answer.
+```{r}
+library(ggpmisc)
+my.formula = y ~ x
+fullbeer %>%
+  ggplot(aes(x=ABV,y=IBU))+
+  geom_point(position = "jitter") +
+  geom_smooth(method="lm", color = "red") +
+  stat_poly_eq(formula = my.formula, 
+               aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+               parse = TRUE,
+               label.y = 0.87,
+               eq.x.rhs = "ABV") +
+  theme_clean() +
+  ggtitle("IBU vs ABV")
+```
+### Question 8: Use KNN classification to investigate the difference between IPAs and other typles of Ales with respect to IBU and ABV.
+```{r}
+library(class)
+library(caret)
+
+#First we pull all the beers that are IPA's or have Ale in the name
+IPAsandAles<-fullbeer[grepl("IPA|Ale",fullbeer$Style),]
+
+#Then we split the data into 2 groups: IPA's and Ales
+IPAs <- IPAsandAles[grepl("IPA|India Pale Ale", IPAsandAles$Style),]
+Ales <- IPAsandAles[!grepl("IPA|India Pale Ale", IPAsandAles$Style),]
+
+#Create a new column to identify each beer as IPA or Ale and then re-combine datasets
+IPAs$Class = "IPA"
+Ales$Class = "Ale"
+IPAsandAles <- rbind(IPAs, Ales)
+
+#Create new data frame from IPAsandAles that only includes IBU, ABV, and Class information.
+IPAAle <- data.frame(ABV = IPAsandAles$ABV, 
+                     IBU = IPAsandAles$IBU, 
+                     ZABV = scale(IPAsandAles$ABV),
+                     ZIBU = scale(IPAsandAles$IBU),
+                     Class = IPAsandAles$Class)
+
+#We are first splitting our data into a training set and a validation set.
+
+#Train 80% validate 20%
+set.seed(1)
+trainIndices = sample(1:dim(IPAAle)[1],round(.8* dim(IPAAle)[1]))
+train = IPAAle[trainIndices,]
+validate = IPAAle[-trainIndices,]
+
+#To tune the hyperparameters, we did a  cross validation and a for loop using train/test splits.  
+
+iterations = 500
+numks = 30
+masterAcc = matrix(nrow = 1, ncol = numks)
+masterSens = matrix(nrow = 1, ncol = numks)
+masterSpec = matrix(nrow = 1, ncol = numks)
+
+  for(i in 1:numks)
+  {
+    classifications = knn.cv(train[,c(3,4)],train$Class, prob = TRUE, k = i)
+    table(classifications,train$Class)
+    CM = confusionMatrix(table(classifications,train$Class))
+    masterAcc[1,i] = CM$overall[1]
+    masterSens[1,i]=CM$byClass[1]
+    masterSpec[1,i]=CM$byClass[2]
+  }
+
+MeanAcc = colMeans(masterAcc)
+MeanSens=colMeans(masterSens)
+MeanSpec = colMeans(masterSpec)
+
+#Make plots to see the effect of K
+par(mfrow=c(1,3))
+CVAcc = data.frame(K = seq(1,numks,1), MeanAcc = MeanAcc)
+CVAcc %>% 
+  ggplot(aes(K, MeanAcc)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab("Accuracy")+
+  ggtitle("Effect of K on Accuracy (CV)")
+
+CVSens = data.frame(K = seq(1,numks,1), MeanSens = MeanSens)
+CVSens %>% 
+  ggplot(aes(K, MeanSens)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab("Sensitivity")+
+  ggtitle("Effect of K on Sensitivity (CV)")
+
+CVSpec = data.frame(K = seq(1,numks,1), MeanSpec = MeanSpec)
+CVSpec %>% 
+  ggplot(aes(K, MeanSpec)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab("Specificity")+
+  ggtitle("Effect of K on Specificity (CV)")
+
+
+
+# This for loop creates 500 iterations of train/test splits (from the training data) to tune k
+iterations = 500
+numks = 30
+masterAcc = matrix(nrow = iterations, ncol = numks)
+masterSens = matrix(nrow = iterations, ncol = numks)
+masterSpec = matrix(nrow = iterations, ncol = numks)
+splitPerc=.75
+
+for(j in 1:iterations)
+{
+  trainIndices = sample(1:dim(train)[1],round(splitPerc * dim(train)[1]))
+  train1 = train[trainIndices,]
+  test1 = train[-trainIndices,]
+  for(i in 1:numks)
+  {
+    classifications = knn(train1[,c(3,4)],test1[,c(3,4)],train1$Class, prob = TRUE, k = i)
+    CM = confusionMatrix(table(classifications,test1$Class))
+    masterAcc[j,i] = CM$overall[1]
+    masterSens[j,i] = CM$byClass[1]
+    masterSpec[j,i] = CM$byClass[2]
+  }
+}
+
+MeanAcc = colMeans(masterAcc)
+MeanSens = colMeans(masterSens)
+MeanSpec = colMeans(masterSpec)
+
+kAcc = data.frame(K = seq(1,numks,1), Accuracy = MeanAcc)
+kAcc %>% 
+  ggplot(aes(K, Accuracy)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab("Accuracy")+
+  ggtitle("Effect of K on Accuracy (Train/Test Split)")
+
+kSens = data.frame(K = seq(1,numks,1), Sensitivity = MeanSens)
+kSens %>% 
+  ggplot(aes(K, Sensitivity)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab("Sensitivity")+
+  ggtitle("Effect of K on Sensitivity (Train/Test Split)")
+
+kSpec = data.frame(K = seq(1,numks,1), Specificity = MeanSpec)
+kSpec %>% 
+  ggplot(aes(K, MeanSpec)) +
+  geom_point() +
+  geom_line() +
+  theme_clean() + 
+  ylab("Specificity")+
+  ggtitle("Effect of K on Specificity (Train/Test Split)")
+
+#We settled on k=25 as it balanced Accuracy, Sensitivity and Specificity the best.
+classifications = knn(train[,c(3,4)],validate[,c(3,4)],train$Class, prob = TRUE, k = 19)
+CM = confusionMatrix(table(classifications,validate$Class))
+confusionMatrix(table(classifications,validate$Class))
+
+```
+
+
+###Exploring a Naive Bayes model
+```{r}
+##Naive Bayes Exploration
+
+library(e1071)
+model = naiveBayes(Class~ABV+IBU,data = train)
+confusionMatrix(table(predict(model,validate[,c(1,2)]),as.factor(validate$Class)))
+```
+
+###Other Useful Inference: Most and Least numerous type of beer by State
+```{r}
+count_by_state<-fullbeer%>%group_by(State)%>%count(Style)
+max_counts_by_State<-count_by_state%>%group_by(State)%>%summarize(n=max(n))
+style_by_state<-left_join(max_counts_by_State,count_by_state,by=c("State","n"))
+style_by_state$Style = as.factor(style_by_state$Style)
+
+summary(style_by_state)
+most_popular_styles = 
+  style_by_state %>%
+  group_by(Style) %>%
+  summarise(n = n())
+
+most_popular_styles %>%
+  ggplot(aes(x = reorder(Style, n), y = n, fill = Style)) +
+  geom_bar(stat = "identity") +
+  theme_clean() +
+  coord_flip() + 
+  theme(legend.position = "none") + 
+  ylab("Frequency of most numerous beers in each state") +
+  xlab("Style") +
+  ggtitle("Most numerous beers in Each State")
+
+IPAState = count_by_state%>%group_by(State)%>%filter(Style == "American IPA")
+IPAState %>%
+  ggplot(aes(x = reorder(State, n), y = n, fill = State)) +
+  geom_bar(stat = "identity") +
+  theme_clean() +
+  coord_flip() + 
+  theme(legend.position = "none") + 
+  ylab("Number of American IPA's") +
+  xlab("State") +
+  ggtitle("Number of American IPA's in each state")
+
+#We could make the conclusion that IPA's could be introduced into those markets that don't have many IPA's as that is the most popular class of beers in the states. 
+
+max_style_by_state = style_by_state %>% group_by(State) %>% summarize(n= max(n))
+summary(as.factor(style_by_state$Style))
+```

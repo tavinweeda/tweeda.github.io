@@ -1,0 +1,14 @@
+---
+title: "About me"
+author: "Tavin"
+date: "11/5/2021"
+output: html_document
+---
+
+Name: Tavin Weeda
+
+Location: Seattle, WA
+
+Interest: Skiing, rock climbing, cooking
+
+School: Graduate from Ohio State University
