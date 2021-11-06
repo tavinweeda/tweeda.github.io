@@ -5,6 +5,7 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "Analysis"
+      href: Aboutme.html
     - text: "Beer Study"
       href: Beers.html
     
